@@ -1,5 +1,7 @@
+import 'package:election_2566_poll/services/api.dart';
 import 'package:flutter/material.dart';
-
+//import 'package:election_2566_poll/models/poll.dart';
+//import 'package:election_2566_poll/pages/my_scaffold.dart';
 import '../../models/poll.dart';
 import '../my_scaffold.dart';
 
@@ -21,7 +23,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   _loadData() async {
+    setState(() {
+      _isLoading = true;
+    });
     // todo: Load list of polls here
+    //await Future.delayed(const Duration(seconds: 3), () {});
+    try {
+      var result = await ApiClient().getPolls();
+      setState(() {
+        _polls = result;
+      });
+    } catch (e) {
+      setState(() {
+      });
+      // todo: กรณี Error
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -34,6 +54,14 @@ class _HomePageState extends State<HomePage> {
             child: Stack(
               children: [
                 if (_polls != null) _buildList(),
+                    _polls == null
+                    ? const SizedBox.shrink()
+                    : ListView.builder(
+                    itemCount: _polls!.length,
+                    itemBuilder: (context, index){
+                      return Text(_polls![index].id.toString());
+                  },
+                ),
                 if (_isLoading) _buildProgress(),
               ],
             ),
@@ -44,11 +72,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   ListView _buildList() {
+    _polls == null;
     return ListView.builder(
       itemCount: _polls!.length,
       itemBuilder: (BuildContext context, int index) {
         // todo: Create your poll item by replacing this Container()
-        return Container();
+        return Text(_polls![index].question); //return Container();
       },
     );
   }
